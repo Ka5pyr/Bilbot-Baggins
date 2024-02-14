@@ -1,0 +1,30 @@
+
+# Byte-compiled /opticized / DLL Files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+venv/
+env/
+.venv/
+.evn/
+
+# .env Files
+.env
+
+# Local Config Files
+.replit
+config.py
+
+# Package Folders
+.local/
+.pythonlibs/
+.upm/
+
+# Package Files
+poetry.lock
+pyproject.toml
+
+# Log Files
+*.log
