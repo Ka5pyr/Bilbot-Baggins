@@ -31,7 +31,7 @@ async def send_help_message(ctx):
         last_help_message_time[channel_id] < timedelta(minutes=1):     
         
         # Don't Return andything if the time is too recent
-        await ctx.send('Please reference the above help menu on' + 
+        await ctx.send('Please reference the above help menu on ' + 
                         'how to use the /rank command.')
         return
     
@@ -45,6 +45,7 @@ async def send_help_message(ctx):
         "\t + `/rank 8k`\n"
         "\t + `/rank 1dan`\n"
         "_Use the command with your rank to set or update your rank._"
+        "_Make sure there isn't a space between your <number> and <rank> (i.e. 1 Dan)._"
     )
     last_help_message_time[channel_id] = current_time
     await ctx.send(help_message)
