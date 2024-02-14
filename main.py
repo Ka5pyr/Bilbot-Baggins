@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 from datetime import datetime, timedelta
@@ -10,6 +11,11 @@ from dotenv import load_dotenv
 # Load Discord Token
 load_dotenv()
 DISCORD_TOKEN: Final[str] = os.environ['DISCORD_TOKEN']
+
+# Logging Setup
+logging.basicConfig(filename='bilbot.log',
+                    level=logging.INFO,
+                    format='%(asctime)s:%(levelname)s:%(message)s')
 
 # Dictionary to keep track of the last time the help message was sent
 last_help_message_time: dict[str, datetime] = {}
@@ -110,8 +116,11 @@ async def change_nickname(ctx, *, rank: str=""):
     member = ctx.message.author
     current_time = datetime.now()
 
+    logging.info(f"Received rank command from user {member.name} with input: '{rank}'")
+
     # Check if the user already has a rank and remove it if so
     tmp_uname = current_name_check(member.display_name)
+    logging.debug(f"Current name: {tmp_uname}")
 
     if rank == "" or rank == "-h":
         await send_help_message(ctx)
@@ -129,11 +138,13 @@ async def change_nickname(ctx, *, rank: str=""):
             pic = File(f)
         await ctx.send("A mere program cannot impact a being such as Eru Ilúvatar." +
                        "\nI am the one who must be changed.", file=pic)
+        logging.info(f"Server Owner {member} attempted the rank command")
     # Verify the user hasn't recently updated their rank
     elif member.id in last_rank_command_time:
         time_since_last_command = current_time - last_rank_command_time[member.id]
         if time_since_last_command < timedelta(minutes=1):
             # Inform the user about the cooldown
+            logging.warning(f"User {member} attempted to update their rank too frequently")
             await ctx.send("Please wait a minute before using the /rank command again.")
             return  # Exit the command without changing the rank
     else:
@@ -141,9 +152,11 @@ async def change_nickname(ctx, *, rank: str=""):
             # Change the user's nickname
             await member.edit(nick=f"{tmp_uname} [{valid_rank}]")
             await ctx.send(f"Your rank has been changed to **{valid_rank}**.")
+            logging.info(f"Changed nickname for user {member} to rank: {valid_rank}")
         # Grab any errors that occur
         except Exception as e:
-            print(e)
+            logging.error(f"Failed to change nickname for user {member}: {e}")
+            await ctx.send("Dark forces have corrupted your request. Please try again later.")
             
     # Update the last time the /rank command was used by the user
     last_rank_command_time[member.id] = current_time
