@@ -54,15 +54,15 @@ async def send_help_message(ctx):
 def current_name_check(current_name: str) -> str:
 
     # Check if a patter is in the current name
-    pattern = re.compile(r"\d{1,2}[a-z]{1,3}$")
+    pattern = re.compile(r"\s*\[\d{1,2}[a-z]{1,3}\]$", re.IGNORECASE)
 
     # If the ranking is found replace it with an empty string
     # Return the username with the rank removed
-    return re.sub(pattern, '', current_name)
+    return re.sub(pattern, '', current_name).strip()
 
 
 # Funtion to verify the user input of the rank command
-def rank_check(rank: str) -> bool:
+def rank_check(rank: str) -> str:
 
     # Modify the rank variable for easy checking
     lower_rank = rank.lower()
@@ -73,12 +73,20 @@ def rank_check(rank: str) -> bool:
     if match:
         # Split the rank input into the number and the letter
         num_group, str_group = match.groups()
+        if str_group == 'k':
+            rank = lower_rank.replace('k', 'kyu')
+        elif str_group == 'd':
+            rank = lower_rank.replace('d', 'dan')
+        elif str_group == 'p':
+            rank = lower_rank.replace('p', 'pro')
 
         # Match the input to the possible Go ranks
-        return (str_group in ['k', 'kyu'] and 1<= int(num_group) <= 30) \
-           or (str_group in ['d', 'dan','p','pro'] and 1<= int(num_group) <= 10)
-    else:
-        return False
+        if (rank.endswith('kyu') and 1<= int(num_group) <= 30)\
+            or (rank.endswith('dan') and 1<= int(num_group) <= 10)\
+            or (rank.endswith('pro') and 1<= int(num_group) <= 10):
+            return rank
+            
+    return""
         
 """    
 @bot.event
@@ -107,8 +115,10 @@ async def change_nickname(ctx, *, rank: str=""):
         return
 
     # Validate the input was formatted correctly
-    if not rank_check(rank):
-        return await send_help_message(ctx)
+    valid_rank = rank_check(rank)
+    if not valid_rank:
+        await send_help_message(ctx)
+        return
         
     # Check if the user is the Server Owner
     elif member.id == ctx.guild.owner_id:
@@ -119,8 +129,8 @@ async def change_nickname(ctx, *, rank: str=""):
     else:
         try:
             # Change the user's nickname
-            await member.edit(nick=f"{tmp_uname} [{rank}]")
-            await ctx.send(f"Your rank has been changed to [{rank}].")
+            await member.edit(nick=f"{tmp_uname} [{valid_rank}]")
+            await ctx.send(f"Your rank has been changed to **{valid_rank}**.")
         # Grab any errors that occur
         except Exception as e:
             print(e)

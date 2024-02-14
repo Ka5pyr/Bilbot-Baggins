@@ -21,6 +21,7 @@ config.py
 .local/
 .pythonlibs/
 .upm/
+.git
 
 # Package Files
 poetry.lock
