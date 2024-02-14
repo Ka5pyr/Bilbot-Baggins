@@ -94,16 +94,8 @@ def rank_check(rank: str) -> str:
             or (rank.endswith('pro') and 1<= int(num_group) <= 10):
             return rank
             
-    return""
-        
-"""    
-@bot.event
-async def on_message(message: Message):
-    if message.author == bot.user:
-        return
-        
-    await bot.process_commands(message)
-"""
+    return ""
+    
     
 # Message when the bot is ready
 @bot.event
