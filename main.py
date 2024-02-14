@@ -13,6 +13,7 @@ DISCORD_TOKEN: Final[str] = os.environ['DISCORD_TOKEN']
 
 # Dictionary to keep track of the last time the help message was sent
 last_help_message_time: dict[str, datetime] = {}
+last_rank_command_time: dict[int, datetime] = {}
 
 # BOT Intents - https://discordpy.readthedocs.io/en/stable/intents.html
 intents: Intents = Intents.default()
@@ -107,6 +108,7 @@ async def on_ready():
 @bot.command(name="rank")
 async def change_nickname(ctx, *, rank: str=""):
     member = ctx.message.author
+    current_time = datetime.now()
 
     # Check if the user already has a rank and remove it if so
     tmp_uname = current_name_check(member.display_name)
@@ -127,6 +129,13 @@ async def change_nickname(ctx, *, rank: str=""):
             pic = File(f)
         await ctx.send("A mere program cannot impact a being such as Eru Ilúvatar." +
                        "\nI am the one who must be changed.", file=pic)
+    # Verify the user hasn't recently updated their rank
+    elif member.id in last_rank_command_time:
+        time_since_last_command = current_time - last_rank_command_time[member.id]
+        if time_since_last_command < timedelta(minutes=1):
+            # Inform the user about the cooldown
+            await ctx.send("Please wait a minute before using the /rank command again.")
+            return  # Exit the command without changing the rank
     else:
         try:
             # Change the user's nickname
@@ -135,7 +144,9 @@ async def change_nickname(ctx, *, rank: str=""):
         # Grab any errors that occur
         except Exception as e:
             print(e)
-
+            
+    # Update the last time the /rank command was used by the user
+    last_rank_command_time[member.id] = current_time
  
 def main() -> None:
     bot.run(token=DISCORD_TOKEN)
