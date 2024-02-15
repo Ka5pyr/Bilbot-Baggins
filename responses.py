@@ -29,10 +29,10 @@ class EmbedCreator:
                 "**Examples:**\n"
                 "\t + `/rank 8k`\n"
                 "\t + `/rank 1dan`\n"
-                "_Use the command with your rank to set or update your rank._"
+                "_Use the command with your rank to set or update your rank._\n"
                 "_Make sure there isn't a space between your <number> and <rank> (i.e. 1 Dan)._"
             ),
-            color=Color.dark_grey()
+            color=Color.teal()
         )
         
     # Cannot Modify the Server Owner Message
@@ -69,7 +69,7 @@ class EmbedCreator:
         return self.create_embed(
             title="Don't Be Hasty!",
             description="Please wait a minute before using the same command again.",
-            color=Color.dark_green()
+            color=Color.teal()
         )
         
     
