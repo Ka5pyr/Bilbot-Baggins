@@ -7,6 +7,7 @@ from typing import Final
 from discord import File, Intents
 from discord.ext import commands
 from dotenv import load_dotenv
+import responses
 
 # Load Discord Token
 load_dotenv()
@@ -29,34 +30,9 @@ bot = commands.Bot(command_prefix="/", intents=intents)
 
 # Function that specifies a specific help menu for the /rank command
 async def send_help_message(ctx):
-    global last_help_message_time
-    current_time = datetime.now()
     channel_id = ctx.channel.id
-
-    # Check if the help message has been sent within the last 5 minutes
-    if channel_id in last_help_message_time and current_time - \
-        last_help_message_time[channel_id] < timedelta(minutes=1):     
-        
-        # Don't Return andything if the time is too recent
-        await ctx.send('Please reference the above help menu on ' + 
-                        'how to use the /rank command.')
-        return
-    
-    help_message = (
-        "**Command Format:** `/rank [rank]`\n"
-        "**Valid rank formats include:**\n"
-        "\t + For kyu ranks: `<number>k` or `<number>kyu` (e.g., `8k` or `12kyu`)\n"
-        "\t + For dan ranks: `<number>d` or `<number>dan` (e.g., `1d` or `4dan`)\n"
-        "\t + For pro ranks: `<number>p` or `<number>pro` (e.g., `1p` or `2pro`)\n"
-        "**Examples:**\n"
-        "\t + `/rank 8k`\n"
-        "\t + `/rank 1dan`\n"
-        "_Use the command with your rank to set or update your rank._"
-        "_Make sure there isn't a space between your <number> and <rank> (i.e. 1 Dan)._"
-    )
-    last_help_message_time[channel_id] = current_time
-    await ctx.send(help_message)
-    
+    if responses.should_send_help_message(channel_id):
+        await ctx.send(responses.get_help_message())
 
 # Funtion to check if a rank has already been added to the username
 def current_name_check(current_name: str) -> str:
@@ -93,62 +69,58 @@ def rank_check(rank: str) -> str:
             or (rank.endswith('dan') and 1<= int(num_group) <= 10)\
             or (rank.endswith('pro') and 1<= int(num_group) <= 10):
             return rank
-            
     return ""
     
     
 # Message when the bot is ready
 @bot.event
 async def on_ready():
-    print(f"{bot.user} has connected to the Discord Channel.")
+    logging.info(f"{bot.user} has connected to the Discord.")
+    # Log the names of the servers the bot is connects to
+    for guild in bot.guilds:
+        logging.info(f"{bot.user} connected to guild: {guild.name} (id: {guild.id})")
+
 
 # Command to Add/Change the rank of the user
 @bot.command(name="rank")
 async def change_nickname(ctx, *, rank: str=""):
     member = ctx.message.author
     current_time = datetime.now()
-
     logging.info(f"Received rank command from user {member.name} with input: '{rank}'")
 
     # Check if the user already has a rank and remove it if so
     tmp_uname = current_name_check(member.display_name)
     logging.debug(f"Current name: {tmp_uname}")
 
-    if rank == "" or rank == "-h":
+    valid_rank = rank_check(rank)
+    if rank == "" or rank == "-h" or not valid_rank:
         await send_help_message(ctx)
         return
 
-    # Validate the input was formatted correctly
-    valid_rank = rank_check(rank)
-    if not valid_rank:
-        await send_help_message(ctx)
-        return
-        
     # Check if the user is the Server Owner
     elif member.id == ctx.guild.owner_id:
-        with open("./assets/bowing_hobbit_320x320.png", "rb") as f:
-            pic = File(f)
-        await ctx.send("A mere program cannot impact a being such as Eru Ilúvatar." +
-                       "\nI am the one who must be changed.", file=pic)
+        resp_msg, pic = responses.mod_server_owner_response()
+        await ctx.send(resp_msg, file=pic)
         logging.info(f"Server Owner {member} attempted the rank command")
+        
     # Verify the user hasn't recently updated their rank
     elif member.id in last_rank_command_time:
         time_since_last_command = current_time - last_rank_command_time[member.id]
         if time_since_last_command < timedelta(minutes=1):
             # Inform the user about the cooldown
             logging.warning(f"User {member} attempted to update their rank too frequently")
-            await ctx.send("Please wait a minute before using the /rank command again.")
+            await ctx.send(responses.wait_message())
             return  # Exit the command without changing the rank
     else:
         try:
             # Change the user's nickname
             await member.edit(nick=f"{tmp_uname} [{valid_rank}]")
-            await ctx.send(f"Your rank has been changed to **{valid_rank}**.")
+            await ctx.send(responses.successful_rank_change_message(valid_rank))
             logging.info(f"Changed nickname for user {member} to rank: {valid_rank}")
         # Grab any errors that occur
         except Exception as e:
             logging.error(f"Failed to change nickname for user {member}: {e}")
-            await ctx.send("Dark forces have corrupted your request. Please try again later.")
+            await ctx.send(responses.error_message())
             
     # Update the last time the /rank command was used by the user
     last_rank_command_time[member.id] = current_time
