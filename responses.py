@@ -18,22 +18,24 @@ class EmbedCreator:
 
     # Help Message
     def rank_help_message(self) -> Embed:
-        return self.create_embed(
+        embed =  self.create_embed(
             title="Rank Command Help",
-            description=(
-                "**Command Format:** `/rank [rank]`\n"
-                "**Valid rank formats include:**\n"
-                "\t + For kyu ranks: `<number>k` or `<number>kyu` (e.g., `8k` or `12kyu`)\n"
-                "\t + For dan ranks: `<number>d` or `<number>dan` (e.g., `1d` or `4dan`)\n"
-                "\t + For pro ranks: `<number>p` or `<number>pro` (e.g., `1p` or `2pro`)\n"
-                "**Examples:**\n"
-                "\t + `/rank 8k`\n"
-                "\t + `/rank 1dan`\n"
-                "_Use the command with your rank to set or update your rank._\n"
-                "_Make sure there isn't a space between your <number> and <rank> (i.e. 1 Dan)._"
-            ),
+            description="**Command Format:** `/rank [rank]`\n",
             color=Color.teal()
         )
+        embed.add_field(name="Examples", value=(
+            "- `/rank 8k`\n"
+            "- `/rank 4dan`\n"
+            "- `/rank 4p`"
+        ))
+        embed.add_field(name="Valid Rank Formats", value=(
+            "- For kyu ranks: `<number>k` or `<number>kyu` (e.g., `8k` or `12kyu`)\n"
+            "- For dan ranks: `<number>d` or `<number>dan` (e.g., `1d` or `4dan`)\n"
+            "- For pro ranks: `<number>p` or `<number>pro` (e.g., `1p` or `2pro`)\n"
+        ))
+        embed.set_footer(text=
+            "Note: Ensure there is no space between the number and rank (e.g., 1 Dan).")
+        return embed
         
     # Cannot Modify the Server Owner Message
     def mod_server_owner_response(self) -> Embed:
@@ -46,8 +48,9 @@ class EmbedCreator:
             color=Color.dark_red()
         )
         #img_path = "assets/bowing_hobbits_320x320.png"
-        img_path = "https://drive.google.com/file/d/1-wFlB-dtKrHSVwPjUarpLvZvFlQnn_a5/view?usp=sharing"
+        img_path = "https://github.com/Ka5pyr/Bilbot-Baggins/blob/main/assets/bowing_hobbit_320x320.png"
         embed.set_image(url=img_path)
+        print(embed.image)
         return embed
         
     # An Error Occurred Message
