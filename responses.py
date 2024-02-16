@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta
 from typing import Optional
 
-from discord import Color, Embed, File
+from discord import Color, Embed
 
 # Keep track of the last time the help message was sent per channel
 last_help_message_time: dict[int, datetime] = {}
@@ -45,8 +45,9 @@ class EmbedCreator:
             ),
             color=Color.dark_red()
         )
-        img_path = "assets/bowing_hobbits_320x320.png"
-        embed.set_image(url=f"attachment://{img_path}")
+        #img_path = "assets/bowing_hobbits_320x320.png"
+        img_path = "https://drive.google.com/file/d/1-wFlB-dtKrHSVwPjUarpLvZvFlQnn_a5/view?usp=sharing"
+        embed.set_image(url=img_path)
         return embed
         
     # An Error Occurred Message

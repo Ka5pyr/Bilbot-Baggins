@@ -1,12 +1,15 @@
 import logging
 import os
 import re
+import sys
 from datetime import datetime, timedelta
 from typing import Final
 
+from daemonize import Daemonize
 from discord import Color, Intents
 from discord.ext import commands
 from dotenv import load_dotenv
+
 import responses
 
 # Load Discord Token
@@ -19,7 +22,6 @@ logging.basicConfig(filename='bilbot.log',
                     format='%(asctime)s:%(levelname)s:%(message)s')
 
 # Dictionary to keep track of the last time the help message was sent
-last_help_message_time: dict[str, datetime] = {}
 last_rank_command_time: dict[int, datetime] = {}
 
 # Load Embed Class
@@ -100,7 +102,7 @@ async def change_nickname(ctx, *, rank: str=""):
     logging.debug(f"Current name: {tmp_uname}")
 
     valid_rank = rank_check(rank)
-    if rank == "" or rank == "-h" or not valid_rank:
+    if rank.lower().strip() in ["","-h", "help"] or not valid_rank:
         await send_help_message(ctx)
         return
 
@@ -140,4 +142,10 @@ def main() -> None:
 
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) == 2 and (sys.argv[1] in ['-d', '--daemon']):
+        app_name = "bilbot_baggins"
+        pid_file = f"/run/{app_name}/{app_name}.pid"
+        daemon = Daemonize(app=app_name, pid=pid_file, action=main)
+        daemon.start()
+    else:
+        main()
