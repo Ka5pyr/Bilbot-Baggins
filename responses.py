@@ -73,7 +73,10 @@ class EmbedCreator:
     def wait_message(self) -> Embed:
         return self.create_embed(
             title="Don't Be Hasty!",
-            description="Please wait a minute before using the same command again.",
+            description=(
+                "Please wait a moment before using the same command again.\n"
+                "Look to the Help Menu for answers abou running the /rank command.\n"
+            ),
             color=Color.teal()
         )
         
@@ -85,5 +88,6 @@ def should_send_help_message(channel_id: int) -> bool:
     if channel_id in last_help_message_time:
         if current_time - last_help_message_time[channel_id] < timedelta(minutes=1):
             return False
+            
     last_help_message_time[channel_id] = current_time
     return True

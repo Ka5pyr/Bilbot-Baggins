@@ -37,9 +37,17 @@ bot = commands.Bot(command_prefix="/", intents=intents)
 # Function that specifies a specific help menu for the /rank command
 async def send_help_message(ctx):
     channel_id = ctx.channel.id
-    if responses.should_send_help_message(channel_id):
-        embed = embed_creator.rank_help_message()
-        await ctx.send(embed=embed)
+    current_time = datetime.now()
+
+    if last_rank_command_time.get(channel_id):
+        last_sent = last_rank_command_time[channel_id]
+        if (current_time - last_sent) < timedelta(minutes=1):
+            await ctx.send(embed=embed_creator.wait_message())
+            return
+
+    last_rank_command_time[channel_id] = current_time
+    embed = embed_creator.rank_help_message()
+    await ctx.send(embed=embed)
 
 
 # Funtion to check if a rank has already been added to the username
