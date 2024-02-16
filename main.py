@@ -151,7 +151,7 @@ def main() -> None:
 
 if __name__ == '__main__':
     if len(sys.argv) == 2 and (sys.argv[1] in ['-d', '--daemon']):
-        app_name = "bilbot_baggins"
+        app_name = "bilbot"
         pid_file = f"/run/{app_name}/{app_name}.pid"
         daemon = Daemonize(app=app_name, pid=pid_file, action=main)
         daemon.start()
