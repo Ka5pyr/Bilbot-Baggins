@@ -1,0 +1,13 @@
+[Unit]
+Description=Bilbot Baggins Daemon
+After=network.target
+
+[Service]
+ExecStart=/home/sgamgee/bots/Bilbot-Baggins/venv/bin/python /home/sgamgee/bots/Bilbot-Baggins/main.py --daemon
+WorkingDirectory=/home/sgamgee/bots/Bilbot-Baggins
+Restart=always
+User=sgamgee
+PIDFile=/run/bilbot/bilbot.pid
+
+[Install]
+WantedBy=default.target
