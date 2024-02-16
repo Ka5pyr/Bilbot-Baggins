@@ -41,16 +41,17 @@ class EmbedCreator:
     def mod_server_owner_response(self) -> Embed:
         embed = self.create_embed(
             title="Server Modification Denied",
-            description = (
-                "A mere program cannot impact a being such as Eru Ilúvatar.\n"
-                "I am the one who must be changed."
-            ),
+            description = "",
             color=Color.dark_red()
         )
         #img_path = "assets/bowing_hobbits_320x320.png"
-        img_path = "https://github.com/Ka5pyr/Bilbot-Baggins/blob/main/assets/bowing_hobbit_320x320.png"
-        embed.set_image(url=img_path)
-        print(embed.image)
+        img_path = "https://imagizer.imageshack.com/img924/6619/syM35e.png"
+        embed.set_thumbnail(url=img_path)
+#        embed.set_image(url=img_path)
+        embed.add_field(name="Forgive Me", value=(
+            "A mere program cannot impact a being such as Eru Ilúvatar.\n"
+            "I am the one who must be changed."
+        ))
         return embed
         
     # An Error Occurred Message
