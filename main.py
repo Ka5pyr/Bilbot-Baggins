@@ -133,7 +133,7 @@ async def change_nickname(ctx, *, rank: str=""):
         try:
             # Change the user's nickname
             await member.edit(nick=f"{tmp_uname} [{valid_rank}]")
-            embed = embed_creator.successful_rank_change_message(valid_rank) 
+            embed = embed_creator.successful_rank_change_message(valid_rank, tmp_uname) 
             await ctx.send(embed=embed)
             logging.info(f"Changed nickname for user {member} to rank: {valid_rank}")
         # Grab any errors that occur

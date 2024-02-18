@@ -63,10 +63,10 @@ class EmbedCreator:
         )
         
     # Successful Rank Change Message
-    def successful_rank_change_message(self, rank: str) -> Embed:
+    def successful_rank_change_message(self, rank: str, member_name: str) -> Embed:
         return self.create_embed(
             title="Rank Change",
-            description=f"Your rank has been changed to **{rank}**.",
+            description=f"{member_name}, your rank has been changed to **{rank}**.",
             color=Color.teal()
         )
         
