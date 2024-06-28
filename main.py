@@ -150,18 +150,18 @@ async def change_nickname(ctx, *, rank: str=""):
     # Update the last time the /rank command was used by the user
     last_rank_command_time[member.id] = current_time
  
-def main(DISCORD_TOKEN) -> None:
+def main() -> None:
+    if len(sys.argv) == 2 and (sys.argv[1] in ['--docker']):
+        DISCORD_TOKEN = get_discord_token()
+    else:
+        # Load Discord Token
+        load_dotenv()
+        DISCORD_TOKEN = os.environ['DISCORD_TOKEN']
+    
     bot.run(token=DISCORD_TOKEN)
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2 and (sys.argv[1] in ['--docker']):
-        DISCORD_TOKEN = get_discord_token()
-        main(DISCORD_TOKEN)
-        
-    # Load Discord Token
-    load_dotenv()
-    DISCORD_TOKEN = os.environ['DISCORD_TOKEN']
         
     if len(sys.argv) == 2 and (sys.argv[1] in ['--daemon']):
         app_name = "bilbot"
@@ -170,4 +170,4 @@ if __name__ == '__main__':
         daemon.start()
         
     else:
-        main(DISCORD_TOKEN)
+        main()
