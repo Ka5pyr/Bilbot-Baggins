@@ -12,9 +12,6 @@ from dotenv import load_dotenv
 
 import responses
 
-# Load Discord Token
-load_dotenv()
-DISCORD_TOKEN: Final[str] = os.environ['DISCORD_TOKEN']
 
 # Logging Setup
 logging.basicConfig(filename='bilbot.log',
@@ -49,6 +46,14 @@ async def send_help_message(ctx):
     embed = embed_creator.rank_help_message()
     await ctx.send(embed=embed)
 
+def get_discord_token() -> str:
+    secret_path = '/run/secrets/discord_token'
+    try:
+        with open(secret_path, 'r') as file:
+            return file.read().strip()
+    except IOError as e:
+        logging.error(f"Error reading Discord token from {secret_path}: {e}")
+        sys.exit(1)
 
 # Funtion to check if a rank has already been added to the username
 def current_name_check(current_name: str) -> str:
@@ -145,15 +150,24 @@ async def change_nickname(ctx, *, rank: str=""):
     # Update the last time the /rank command was used by the user
     last_rank_command_time[member.id] = current_time
  
-def main() -> None:
+def main(DISCORD_TOKEN) -> None:
     bot.run(token=DISCORD_TOKEN)
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2 and (sys.argv[1] in ['-d', '--daemon']):
+    if len(sys.argv) == 2 and (sys.argv[1] in ['--docker']):
+        DISCORD_TOKEN = get_discord_token()
+        main(DISCORD_TOKEN)
+        
+    # Load Discord Token
+    load_dotenv()
+    DISCORD_TOKEN = os.environ['DISCORD_TOKEN']
+        
+    if len(sys.argv) == 2 and (sys.argv[1] in ['--daemon']):
         app_name = "bilbot"
         pid_file = f"/run/{app_name}/{app_name}.pid"
         daemon = Daemonize(app=app_name, pid=pid_file, action=main)
         daemon.start()
+        
     else:
-        main()
+        main(DISCORD_TOKEN)
