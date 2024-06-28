@@ -9,13 +9,14 @@ cd /home/<user>/bots/
 git https://github.com/Ka5pyr/Bilbot-Baggins.git
 cd Bilbot-Baggins
 python3 -m venv venv
-python3 -m pip install -r requirements.txt
+. ./venv/bin/activate
+pip install -r requirements.txt
 ```
 
 ### Add DISCORD_TOKEN into .venv file
 ```bash
 cd /home/sgamgee/bots/Bilgot-Baggins
-touch .venv
+touch .env
 ```
 Copy Key into the .venv with the following format
 ```DISCORD_TOKEN=<KEY>```
